@@ -88,7 +88,29 @@ func (a Article) List(c *gin.Context) {
 // @Failure 400 {object} errcode.Error "请求错误"
 // @Failure 500 {object} errcode.Error "内部错误"
 // @Router /api/v1/articles [post]
-func (a Article) Create(c *gin.Context) {}
+func (a Article) Create(c *gin.Context) {
+	param := service.CreateArticleRequest{}
+	response := app.Response{Ctx: c}
+
+	valid, errs := app.BindAndValid(c, &param)
+	if !valid {
+		global.Logger.Errorf("app.BindAndValid errs : %v", errs)
+		response.ToErrorResponse(errcode.InvalidParams.WithDetails(errs.Errors()...))
+		return
+	}
+	svc := service.New(c.Request.Context())
+
+	err := svc.CreateArticle(&param)
+	if err != nil {
+		global.Logger.Errorf("svc.CreateArticle err :%v", err)
+		response.ToErrorResponse(errcode.ErrorCreateArticleFail)
+		return
+	}
+
+	response.ToResponse(gin.H{})
+	return
+
+}
 
 // @Summary 更新文章
 // @Produce  json

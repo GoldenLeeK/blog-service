@@ -63,3 +63,12 @@ func (t *Tag) Update(db *gorm.DB, values interface{}) error {
 func (t *Tag) Delete(db *gorm.DB) error {
 	return db.Where("id=? AND is_del = ?", t.Model.ID, 0).Delete(&t).Error
 }
+
+func (t *Tag) InTags(db *gorm.DB, tagIds []uint32) ([]*Tag, error) {
+	var tags []*Tag
+	err := db.Where(" is_del = ?", 0).Find(&tags, tagIds).Error
+	if err != nil {
+		return nil, err
+	}
+	return tags, nil
+}

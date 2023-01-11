@@ -15,3 +15,22 @@ func (d *Dao) CountArticle(title string, state uint8) (int, error) {
 	article := model.Article{Title: title, State: state}
 	return article.Count(d.engine)
 }
+
+func (d *Dao) CreateArticle(title, desc, content, CoverImageUrl, createdBy string, state uint8, tagIds []uint32) error {
+	tag := &model.Tag{}
+	tags, _ := tag.InTags(d.engine, tagIds)
+
+	article := model.Article{
+		Title:         title,
+		Desc:          desc,
+		Content:       content,
+		CoverImageUrl: CoverImageUrl,
+		Tags:          tags,
+		State:         state,
+		Model: &model.Model{
+			CreatedBy: createdBy,
+		},
+	}
+
+	return article.Create(d.engine)
+}

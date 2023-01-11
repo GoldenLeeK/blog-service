@@ -54,3 +54,7 @@ func (a *Article) List(db *gorm.DB, pageOffset, pageSize int) ([]*Article, error
 	return articles, err
 
 }
+
+func (a *Article) Create(db *gorm.DB) error {
+	return db.Create(&a).Error
+}

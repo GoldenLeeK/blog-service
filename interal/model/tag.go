@@ -7,12 +7,9 @@ import (
 
 type Tag struct {
 	*Model
-	Name  string `json:"name"`
-	State uint8  `json:"state"`
-}
-
-func (t *Tag) TableName() string {
-	return "blog_tag"
+	Name    string     `json:"name" gorm:"index"`
+	Article []*Article `gorm:"many2many:article_tags"`
+	State   uint8      `json:"state"`
 }
 
 type TagSwagger struct {

@@ -16,7 +16,7 @@ type Model struct {
 	CreatedOn  uint32 `json:"created_on"`
 	ModifiedOn string `json:"modified_on"`
 	DeletedOn  uint32 `json:"deleted_on"`
-	IsDel      uint8  `json:"is_del"`
+	IsDel      uint8  `json:"is_del" gorm:"index"`
 }
 
 func NewDBEngine(setting *setting.DatabaseSettingS) (*gorm.DB, error) {
@@ -36,9 +36,14 @@ func NewDBEngine(setting *setting.DatabaseSettingS) (*gorm.DB, error) {
 	if global.ServerSetting.RunMode == "debug" {
 		db.LogMode(true)
 	}
-	db.SingularTable(true)
+	db.SingularTable(false)
+	gorm.DefaultTableNameHandler = func(db *gorm.DB, defaultTableName string) string {
+		return "blog_" + defaultTableName
+	}
 	db.DB().SetMaxIdleConns(setting.MaxIdleConns)
 	db.DB().SetMaxOpenConns(setting.MaxOpenConns)
+
+	db.AutoMigrate(&Tag{}, &Article{})
 
 	db.Callback().Create().Replace("gorm:update_time_stamp", updateTimeStampForCreateCallback)
 	db.Callback().Update().Replace("gorm:update_time_stamp", updateTimeStampForUpdateCallback)

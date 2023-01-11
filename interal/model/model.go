@@ -13,10 +13,10 @@ type Model struct {
 	ID         uint32 `gorm:"primary_key" json:"id"`
 	CreatedBy  string `json:"created_by"`
 	ModifiedBy string `json:"modified_by"`
-	CreatedOn  uint32 `json:"created_on"`
-	ModifiedOn string `json:"modified_on"`
-	DeletedOn  uint32 `json:"deleted_on"`
-	IsDel      uint8  `json:"is_del" gorm:"index"`
+	CreatedOn  uint32 `json:"created_on" gorm:"default:0"`
+	ModifiedOn uint32 `json:"modified_on" gorm:"default:0"`
+	DeletedOn  uint32 `json:"deleted_on" gorm:"default:0"`
+	IsDel      uint8  `json:"is_del" gorm:"index;default:0"`
 }
 
 func NewDBEngine(setting *setting.DatabaseSettingS) (*gorm.DB, error) {

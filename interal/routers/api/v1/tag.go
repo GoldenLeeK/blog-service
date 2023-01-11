@@ -90,7 +90,7 @@ func (t *Tag) Create(c *gin.Context) {
 
 	if err != nil {
 		global.Logger.Errorf("svc.CreateTag err :%v", err)
-		response.ToErrorResponse(errcode.ErrorCountTagFail)
+		response.ToErrorResponse(errcode.ErrorCreateTagFail)
 		return
 	}
 

@@ -1,6 +1,10 @@
 package v1
 
 import (
+	"github.com/GoldenLeeK/blog-service/global"
+	"github.com/GoldenLeeK/blog-service/interal/service"
+	"github.com/GoldenLeeK/blog-service/pkg/app"
+	"github.com/GoldenLeeK/blog-service/pkg/errcode"
 	"github.com/gin-gonic/gin"
 )
 
@@ -32,7 +36,44 @@ func (a Article) Get(c *gin.Context) {}
 // @Failure 400 {object} errcode.Error "请求错误"
 // @Failure 500 {object} errcode.Error "内部错误"
 // @Router /api/v1/articles [get]
-func (a Article) List(c *gin.Context) {}
+func (a Article) List(c *gin.Context) {
+	param := service.ArticleListRequest{}
+	response := app.Response{Ctx: c}
+	valid, errs := app.BindAndValid(c, &param)
+
+	if !valid {
+		global.Logger.Errorf("app.BindAndValid errs : %v", errs)
+		response.ToErrorResponse(errcode.InvalidParams.WithDetails(errs.Errors()...))
+		return
+	}
+
+	svc := service.New(c.Request.Context())
+	pager := app.Pager{
+		Page:     app.GetPage(c),
+		PageSize: app.GetPageSize(c),
+	}
+
+	totalRaws, err := svc.CountArticle(&service.CountArticleRequest{Title: param.Title, State: param.State})
+
+	if err != nil {
+		global.Logger.Errorf("svc.CountTag err: %v", err)
+		response.ToErrorResponse(errcode.ErrorCountTagFail)
+		return
+	}
+
+	pager.TotalRaws = totalRaws
+
+	articles, err := svc.GetArticleList(&param, &pager)
+	if err != nil {
+		global.Logger.Errorf("svc.GetArticleList err: %v", err)
+		response.ToErrorResponse(errcode.ErrorGetArticleListFail)
+		return
+	}
+
+	response.ToResponseList(articles, totalRaws)
+	return
+
+}
 
 // @Summary 新增文章
 // @Produce  json

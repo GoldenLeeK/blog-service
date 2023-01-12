@@ -43,7 +43,7 @@ func NewDBEngine(setting *setting.DatabaseSettingS) (*gorm.DB, error) {
 	db.DB().SetMaxIdleConns(setting.MaxIdleConns)
 	db.DB().SetMaxOpenConns(setting.MaxOpenConns)
 
-	db.AutoMigrate(&Tag{}, &Article{})
+	db.AutoMigrate(&Tag{}, &Article{}, &Auth{})
 
 	db.Callback().Create().Replace("gorm:update_time_stamp", updateTimeStampForCreateCallback)
 	db.Callback().Update().Replace("gorm:update_time_stamp", updateTimeStampForUpdateCallback)

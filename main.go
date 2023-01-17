@@ -83,6 +83,10 @@ func setupSetting() error {
 
 	global.JWTSetting.Expire *= time.Second
 
+	err = settingConfig.ReadSection("Email", &global.EmailSetting)
+	if err != nil {
+		return err
+	}
 	return nil
 
 }
